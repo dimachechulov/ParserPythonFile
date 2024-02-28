@@ -19,13 +19,13 @@ def count_variables(node):
             s+=tmp
 
             if s not in vars.keys():
-                if s == ".":
-                    pass
+
                 vars[s] = 1
             else:
                 vars[s] +=1
         elif isinstance(n, ast.Constant):
             if str(n.value) not in vars.keys():
+
                 vars[str(n.value)] = 1
             else:
                 vars[str(n.value)] +=1
@@ -310,6 +310,7 @@ def parse_file(file_path):
     opr = count_binaty_opr(tree)
     funcs = count_func(tree, vars)
     skobki = count_skobki(text, funcs)
+    print(f"vars  : {vars}\n loops: {loops}\n opr: {opr}\n funcs {funcs}\n tryes: {tryes} skobki: {skobki}")
 if __name__ == "__main__":
     file_path = "example.py"
     parse_file(file_path)

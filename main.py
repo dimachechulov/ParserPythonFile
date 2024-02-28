@@ -1,260 +1,143 @@
-import ast
-
-
-def count_variables(node):
-    sum = 0
-    vars = dict()
-    for n in ast.walk(node):
-        print(n)
-        if isinstance(n, ast.Constant):
-            if str(n.value) not in vars.keys():
-                vars[str(n.value)] = 1
-            else:
-                vars[str(n.value)] +=1
-        if isinstance(n, ast.Name):
-            if   n.id not in vars.keys():
-                vars[n.id] = 1
-            else:
-                vars[n.id] +=1
-
-    print(vars)
-    return sum
-
-
-def count_binaty_opr(node):
-    oprs = {
-        "+" :0 ,
-        "-": 0,
-        "*": 0,
-        "/": 0,
-        "//": 0,
-        "%": 0,
-        "**": 0,
-        ">>" :0,
-        "<<" :0,
-        "|" :0,
-        "^" :0,
-        "&" :0,
-        "@" : 0,
-        "and" :0,
-        "or" : 0,
-        "==": 0,
-        "!=": 0,
-        "<": 0,
-        "<=": 0,
-        ">": 0,
-        ">=": 0,
-        "is": 0,
-        "is not": 0,
-        "in": 0,
-        "not in" :0,
-        "not": 0,
-        "~" :0,
-        "if":0,
-        "if else" :0,
-        "elif":0,
-        "=":0,
-        "+=": 0,
-        "-=": 0,
-        "*=": 0,
-        "/=": 0,
-        "//=": 0,
-        "%=": 0,
-        "**=": 0,
-        ">>=": 0,
-        "<<=": 0,
-        "|=": 0,
-        "^=": 0,
-        "&=": 0,
-        "@=": 0,
-
-    }
-
-    for n in ast.walk(node):
-        if isinstance(n, ast.Assign):
-            oprs["="]+=len(n.targets)
-        if isinstance(n, ast.If):
-
-            if n.orelse:
-                oprs["if else"] += 1
-                #???elif is new operands???
-                # if isinstance(n.orelse[0], ast.If):
-                #     oprs["if else"]-=1
-                #     oprs['elif']+=1
-                # else:
-                #     oprs["else"]+=1
-            else:
-                oprs["if"]+=1
-        if isinstance(n, ast.UAdd):
-            oprs["+"]+=1
-        if isinstance(n, ast.USub):
-            oprs["-"]+=1
-        if isinstance(n, ast.Invert):
-            oprs["~"]+=1
-        if isinstance(n, ast.Not):
-            oprs["not"]+=1
-        if isinstance(n, ast.Eq):
-            oprs["=="]+=1
-        if isinstance(n, ast.NotEq):
-            oprs["!="]+=1
-        if isinstance(n, ast.Lt):
-            oprs["<"]+=1
-        if isinstance(n, ast.LtE):
-            oprs["<="]+=1
-        if isinstance(n, ast.Gt):
-            oprs[">"] += 1
-        if isinstance(n, ast.GtE):
-            oprs[">="] += 1
-        if isinstance(n, ast.Is):
-            oprs["is"]+=1
-        if isinstance(n, ast.IsNot):
-            oprs["is not"]+=1
-        if isinstance(n, ast.In):
-            oprs["in"] += 1
-        if isinstance(n, ast.NotIn):
-            oprs["not in"] += 1
-        if isinstance(n, ast.BinOp):
-
-            if isinstance(n.op, ast.Add):
-                oprs["+"] +=1
-            if isinstance(n.op, ast.Sub):
-                oprs["-"] +=1
-            if isinstance(n.op, ast.Mult):
-                oprs["*"] +=1
-            if isinstance(n.op, ast.Div):
-                oprs["/"] +=1
-            if isinstance(n.op, ast.FloorDiv):
-                oprs["//"] +=1
-            if isinstance(n.op, ast.Mod):
-                oprs["%"] +=1
-            if isinstance(n.op, ast.Pow):
-                oprs["**"] +=1
-            if isinstance(n.op, ast.LShift):
-                oprs["<<"] +=1
-            if isinstance(n.op, ast.RShift):
-                oprs[">>"] +=1
-            if isinstance(n.op, ast.BitOr):
-                oprs["|"] +=1
-            if isinstance(n.op, ast.BitXor):
-                oprs["^"] +=1
-            if isinstance(n.op, ast.BitAnd):
-                oprs["&"] +=1
-            if isinstance(n.op, ast.MatMult):
-                oprs["@"] +=1
-        if isinstance(n, ast.AugAssign):
-
-            if isinstance(n.op, ast.Add):
-                oprs["+="] +=1
-            if isinstance(n.op, ast.Sub):
-                oprs["-="] +=1
-            if isinstance(n.op, ast.Mult):
-                oprs["*="] +=1
-            if isinstance(n.op, ast.Div):
-                oprs["/="] +=1
-            if isinstance(n.op, ast.FloorDiv):
-                oprs["//="] +=1
-            if isinstance(n.op, ast.Mod):
-                oprs["%="] +=1
-            if isinstance(n.op, ast.Pow):
-                oprs["**="] +=1
-            if isinstance(n.op, ast.LShift):
-                oprs["<<="] +=1
-            if isinstance(n.op, ast.RShift):
-                oprs[">>="] +=1
-            if isinstance(n.op, ast.BitOr):
-                oprs["|="] +=1
-            if isinstance(n.op, ast.BitXor):
-                oprs["^="] +=1
-            if isinstance(n.op, ast.BitAnd):
-                oprs["&="] +=1
-            if isinstance(n.op, ast.MatMult):
-                oprs["@="] +=1
-        if isinstance(n, ast.BoolOp):
-            if isinstance(n.op, ast.And):
-                oprs["and"] +=1
-            if isinstance(n.op, ast.Or):
-                oprs["or"] +=1
-
-    print(oprs)
-def count_loops(node):
-    loops= {
-        "For" :0,
-        "While":0,
-        "break" :0,
-        "continue" :0,
-    }
-    for n in ast.walk(node):
-        if isinstance(n, ast.For):
-            loops["For"]+=1
-        elif isinstance(n,ast.While):
-            loops["While"]+=1
-        elif isinstance(n,ast.Break):
-            loops["break"]+=1
-        elif isinstance(n, ast.Continue):
-            loops["continue"] += 1
-    print(f"funcs: {loops}")
-def count_try_excent(node):
-    tryes = {
-        "try..except..finally":0
-    }
-    for n in ast.walk(node):
-        if isinstance(n, ast.Try):
-            tryes["try..except..finally"]+=1
-def count_func(node):
-    funcs = {
-        "return":0,
-        "yeild" :0,
-        "yeild from":0,
-        "lambda":0,
-        "pass":0,
-        "assert":0,
-        "with":0,
-    }
-    for n in ast.walk(node):
-        if isinstance(n, ast.With):
-            funcs["with"]+=1
-        if isinstance(n, ast.Assert):
-            funcs["assert"]+=1
-        if isinstance(n, ast.Return):
-            funcs["return"]+=1
-        elif isinstance(n, ast.Pass):
-            funcs["pass"]+=1
-        elif isinstance(n, ast.Lambda):
-            funcs["lambda"]+=1
-        elif isinstance(n, ast.Yield):
-            funcs["yeild"]+=1
-        elif isinstance(n, ast.YieldFrom):
-            funcs["yeild from"]+=1
-        if isinstance(n, ast.Call):
-            if isinstance(n.func, ast.Attribute):#methods
-                if n.func.attr not in funcs:
-                    funcs[n.func.attr]=1
-                else:
-                    funcs[n.func.attr] += 1
-            elif isinstance(n.func, ast.Name):#functions
-                if n.func.id not in funcs:
-                    funcs[n.func.id]=1
-                else:
-                    funcs[n.func.id] += 1
-        #???do we need to add a function declaration to the operands????
-        # if isinstance(n, ast.FunctionDef):
-        #     if n.func.attr not in funcs:
-        #         funcs[n.name] = 1
-        #     else:
-        #         funcs[n.name] += 1
-
-    print(funcs)
+from PyQt5.QtWidgets import *
+from PyQt5.QtCore import QSize, Qt
+from parser import *
+import numpy
 
 def parse_file(file_path):
     with open(file_path, 'r') as f:
-        tree = ast.parse(f.read())
+        text = f.read()
+        tree = ast.parse(text)
+    return text,tree
+class MainWindow(QMainWindow):
+    # Override class constructor
+    file_path = ""
+
+    def __init__(self):
+        # You must call the super class method
+        QMainWindow.__init__(self)
+
+        self.setMinimumSize(QSize(1800, 800))  # Set sizes
+        self.setWindowTitle("Работа с QTableWidget")  # Set the window title
+        central_widget = QWidget(self)  # Create a central widget
+        self.setCentralWidget(central_widget)  # Install the central widget
+
+        grid_layout = QGridLayout(self)  # Create QGridLayout
+        central_widget.setLayout(grid_layout)  # Set this layout in central widget
+
+        self.table = QTableWidget(self)  # Create a table
+        self.table.setColumnCount(6)  # Set three columns
+        self.table.setRowCount(1)  # and one row
+        self.table.setMinimumWidth(500)
+        self.table.setMinimumHeight(500)
+        self.table.move(0, 30)
+
+        self.file_content = QTextEdit(self)
+        self.file_content.setReadOnly(True)
+        self.file_content.setMinimumWidth(700)
+        self.file_content.setMinimumHeight(800)
+        self.file_content.move(800, 20)
+
+        self.parse_button = QPushButton(self)
+        self.parse_button.setText("Рассчитать метрику Холстеда")
+        self.parse_button.setMinimumWidth(200)
+        self.parse_button.move(200, 0)
+        self.parse_button.setDisabled(True)
+        self.parse_button.clicked.connect(self.on_parse_clicked)
+
+        self.file_button = QPushButton(self)
+        self.file_button.setText("Выбрать файл")
+        self.file_button.setMinimumWidth(200)
+        self.file_button.clicked.connect(self.on_file_clicked)
+
+        # Set the table headers
+        self.table.setHorizontalHeaderLabels(["j", "Оператор", "f1j", "i", "Операнд", "f2j"])
+        self.table.verticalHeader().hide()
+        self.table.resizeColumnsToContents()
+
+        self.program_dict = QLineEdit(self)
+        self.program_dict.setReadOnly(True)
+        self.program_dict.setMinimumWidth(300)
+        self.program_dict.move(500, 30)
+
+        self.program_len = QLineEdit(self)
+        self.program_len.setReadOnly(True)
+        self.program_len.setMinimumWidth(300)
+        self.program_len.move(500, 60)
+
+        self.program_volume = QLineEdit(self)
+        self.program_volume.setReadOnly(True)
+        self.program_volume.setMinimumWidth(300)
+        self.program_volume.move(500, 90)
+
+    def on_parse_clicked(self):
+        #self.file_content.toPlainText() ##Код программы
+        # operators = get_operators ##Вернет словарь из операторов и числа их появлений
+        #operands = get_operands ##Вернет словарь из операндов и числа их появлений
+
+        text, tree = parse_file(self.file_path)
+        vars = count_variables(tree)
+        loops = count_loops(tree)
+        tryes = count_try_excent(tree)
+        opr = count_binaty_opr(tree)
+        funcs = count_func(tree, vars)
+        skobki = {"( )":count_skobki(text, funcs)}
+        operators = loops | tryes | opr | funcs
+        operands = vars | skobki
 
 
-    num_variables = count_variables(tree)
-    num_loops = count_loops(tree)
 
-    count_binaty_opr(tree)
-    count_func(tree)
+        operators = {item[0]: item[1] for item in operators.items() if item[1] != 0}
+        operands = {item[0]: item[1] for item in operands.items() if item[1] != 0}
+
+        len1 = len(operators)
+        len2 = len(operands)
+        rows = max(len1, len2)
+        self.table.clear()
+        self.table.setRowCount(rows + 1)
+
+        j = 0
+        operator_count = 0
+        for operator in operators:
+            self.table.setItem(j, 0, QTableWidgetItem(str(j + 1) + '.'))
+            self.table.setItem(j, 1, QTableWidgetItem(operator))
+            self.table.setItem(j, 2, QTableWidgetItem(str(operators[operator])))
+            j = j + 1
+            operator_count += operators[operator]
+
+        i = 0
+        operand_count = 0
+        for operand in operands:
+            self.table.setItem(i, 3, QTableWidgetItem(str(i + 1) + '.'))
+            self.table.setItem(i, 4, QTableWidgetItem(operand))
+            self.table.setItem(i, 5, QTableWidgetItem(str(operands[operand])))
+            i = i + 1
+            operand_count += operands[operand]
+
+        self.table.setItem(rows, 0, QTableWidgetItem("n1 = " + str(j)))
+        self.table.setItem(rows, 3, QTableWidgetItem("n2 = " + str(i)))
+        self.table.setItem(rows, 2, QTableWidgetItem("N1 = " + str(operator_count)))
+        self.table.setItem(rows, 5, QTableWidgetItem("N2 = " + str(operand_count)))
+
+        self.table.setHorizontalHeaderLabels(["j", "Оператор", "f1j", "i", "Операнд", "f2j"])
+        self.table.verticalHeader().hide()
+        self.table.resizeColumnsToContents()
+
+        self.program_dict.setText("Словарь программы n = " + str(j) + " + " + str(i) + " = " + str(j + i))
+        self.program_len.setText("Длина программы n = " + str(operator_count) + " + " + str(operand_count) + " = " + str(operator_count + operand_count))
+        self.program_volume.setText("Объем программы V = " + str(operator_count + operand_count) + "log2(" + str(j + i) + ") = " + str(round((operator_count + operand_count) * numpy.log2(j + i), 2)))
+
+    def on_file_clicked(self):
+        self.file_path = QFileDialog.getOpenFileNames(self, "Open file", None, "*.py")[0][0]
+        file = open(self.file_path, 'r')
+        content = file.read()
+        file.close()
+        self.file_content.setText(content)
+        self.parse_button.setDisabled(False)
+
 if __name__ == "__main__":
-    file_path = "example.py"
-    parse_file(file_path)
+    import sys
+
+    app = QApplication(sys.argv)
+    mw = MainWindow()
+    mw.show()
+    sys.exit(app.exec())
