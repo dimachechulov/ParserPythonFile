@@ -11,7 +11,11 @@ def count_variables(node):
             while isinstance(n.value, ast.Attribute):
                 s = n.value.attr + "." +s
                 n = n.value
-            s = n.value.id + "." +s
+
+            if isinstance(n.value, ast.Name):
+                s = n.value.id + "." +s
+            else:
+                s = n.value.func.attr + '().' +s
             if s[:-1] in vars.keys():
                 vars[s[:-1] ] -= 1
             else:
@@ -229,7 +233,8 @@ def count_func(node,vars):
         "assert":0,
         "with":0,
         "class":0,
-        "def":0
+        "def":0,
+        "[]":0,
     }
     for n in ast.walk(node):
         if isinstance(n, ast.ClassDef):
@@ -264,19 +269,21 @@ def count_func(node,vars):
                     funcs[n.func.id]=1
                 else:
                     funcs[n.func.id] += 1
-        #???do we need to add a function declaration to the operands????
+
         if isinstance(n, ast.FunctionDef):
-            funcs["def"]+=1
+            #funcs["def"]+=1
             if n.name not in funcs:
                 funcs[n.name] = 1
             else:
                 funcs[n.name] += 1
         if isinstance(n, ast.ClassDef):
-            funcs["class"]+=1
+            #funcs["class"]+=1
             if n.name not in funcs:
                 funcs[n.name] = 1
             else:
                 funcs[n.name] += 1
+        elif isinstance(n, ast.Subscript):
+            funcs["[]"]+=1
 
     return funcs
 def count_skobki(text, funcs):

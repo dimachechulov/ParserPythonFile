@@ -1,315 +1,205 @@
-import ast
-import string
+import math
+class MyClass:
+    def __init__(self, var1,var2,var3):
+        self.var1 = var1
+        self.var2 = var2
+        self.var3 = var3
+        self.var4 = var3 * var2 - var1
 
-def count_variables(node):
+    def MyMethod(self):
+        return self.var1+self.var2
+
+    def get_type(self):
+        return type(self.var1 / self.var2)
+
+def MyFunction(a):
     sum = 0
-    vars = dict()
-    for n in ast.walk(node):
-        if isinstance(n, ast.Attribute):
-            tmp= n.attr
-            s = ""
-            while isinstance(n.value, ast.Attribute):
-                s = n.value.attr + "." +s
-                n = n.value
-            s = n.value.id + "." +s
-            if s[:-1] in vars.keys():
-                vars[s[:-1] ] -= 1
+    for i in range(a):
+        temp = i
+        while True:
+            if i % 2 == 0:
+                continue
             else:
-                vars[s[:-1] ] = -1
-            s+=tmp
+                sum = (sum >> 2) / (i * 3) ^ 23
+                i = i+1
+                if i == a:
+                    break
+        i = temp
+    my_list = list()
+    for i in range(10):
+        my_list.append(i)
+    try:
+        for i in range(12):
+            print(my_list[i])
+    except:
+        print("Index out of range!!")
+    finally:
+        pass
 
-            if s not in vars.keys():
-                if s == ".":
+def f(x):
+    return math.sin(x)
+
+def trapezoidal_rule(a, b, n):
+    h = (b - a) / n
+
+    s = 0.5 * (f(a) + f(b))
+    for i in range(1, n):
+        s += f(a + i * h)
+    return s * h
+
+def calculate_integral(a, b, tolerance):
+    n = 1
+
+    integral_old = trapezoidal_rule(a, b, n)
+    integral_new = trapezoidal_rule(a, b, 2 * n)
+    while math.abs(integral_new - integral_old) > tolerance:
+        n = 2
+        integral_old = integral_new
+        integral_new = trapezoidal_rule(a, b, 2*n)
+    return integral_new
+
+def is_palindrome(word):
+    if word == word[::-1]:
+        print(f"The word {word} is a palindrome.")
+    else:
+        print(f"The word {word} is not a palindrome.")
+
+
+def Myfunc2_test_binary_oprs(param1, param2, param3):
+    if param1 == param2:
+        param3 = param3 >> 2
+        param1 +=4
+        param2 ^= param3
+        var1 = param2 + param3- (param2 / param3)
+        param2 **= 2
+        param3 *= 4
+        param2 |= var1
+        var2 = param1 %(4 + param3-param2)
+    else:
+        var2 = list(range(20))
+        var2[10]+=var2[11] / var2[12]
+
+
+def MyFunc3_test_if(param2, param1):
+    var1 = 10
+    if True == False:
+        print(5 == type(True))
+
+        if 5 == 10:
+            var1 = 7
+            if 3 == 6:
+                var1 = 7
+                if param1 == param2:
                     pass
-                vars[s] = 1
-            else:
-                vars[s] +=1
-        elif isinstance(n, ast.Constant):
-            if str(n.value) not in vars.keys():
-                vars[str(n.value)] = 1
-            else:
-                vars[str(n.value)] +=1
-        elif isinstance(n, ast.Name):
-
-            if   n.id not in vars.keys():
-                vars[n.id] = 1
-            else:
-                vars[n.id] +=1
-
-    return vars
-
-
-def count_binaty_opr(node):
-    oprs = {
-        "+" :0 ,
-        "-": 0,
-        "*": 0,
-        "/": 0,
-        "//": 0,
-        "%": 0,
-        "**": 0,
-        ">>" :0,
-        "<<" :0,
-        "|" :0,
-        "^" :0,
-        "&" :0,
-        "@" : 0,
-        "and" :0,
-        "or" : 0,
-        "==": 0,
-        "!=": 0,
-        "<": 0,
-        "<=": 0,
-        ">": 0,
-        ">=": 0,
-        "is": 0,
-        "is not": 0,
-        "in": 0,
-        "not in" :0,
-        "not": 0,
-        "~" :0,
-        "if":0,
-        "if else" :0,
-        "elif":0,
-        "=":0,
-        "+=": 0,
-        "-=": 0,
-        "*=": 0,
-        "/=": 0,
-        "//=": 0,
-        "%=": 0,
-        "**=": 0,
-        ">>=": 0,
-        "<<=": 0,
-        "|=": 0,
-        "^=": 0,
-        "&=": 0,
-        "@=": 0,
-
-    }
-
-    for n in ast.walk(node):
-        if isinstance(n, ast.Assign):
-            oprs["="]+=len(n.targets)
-        if isinstance(n, ast.If):
-
-            if n.orelse:
-                oprs["if else"] += 1
-                #???elif is new operands???
-                # if isinstance(n.orelse[0], ast.If):
-                #     oprs["if else"]-=1
-                #     oprs['elif']+=1
-                # else:
-                #     oprs["else"]+=1
-            else:
-                oprs["if"]+=1
-        if isinstance(n, ast.UAdd):
-            oprs["+"]+=1
-        if isinstance(n, ast.USub):
-            oprs["-"]+=1
-        if isinstance(n, ast.Invert):
-            oprs["~"]+=1
-        if isinstance(n, ast.Not):
-            oprs["not"]+=1
-        if isinstance(n, ast.Eq):
-            oprs["=="]+=1
-        if isinstance(n, ast.NotEq):
-            oprs["!="]+=1
-        if isinstance(n, ast.Lt):
-            oprs["<"]+=1
-        if isinstance(n, ast.LtE):
-            oprs["<="]+=1
-        if isinstance(n, ast.Gt):
-            oprs[">"] += 1
-        if isinstance(n, ast.GtE):
-            oprs[">="] += 1
-        if isinstance(n, ast.Is):
-            oprs["is"]+=1
-        if isinstance(n, ast.IsNot):
-            oprs["is not"]+=1
-        if isinstance(n, ast.In):
-            oprs["in"] += 1
-        if isinstance(n, ast.NotIn):
-            oprs["not in"] += 1
-        if isinstance(n, ast.BinOp):
-
-            if isinstance(n.op, ast.Add):
-                oprs["+"] +=1
-            if isinstance(n.op, ast.Sub):
-                oprs["-"] +=1
-            if isinstance(n.op, ast.Mult):
-                oprs["*"] +=1
-            if isinstance(n.op, ast.Div):
-                oprs["/"] +=1
-            if isinstance(n.op, ast.FloorDiv):
-                oprs["//"] +=1
-            if isinstance(n.op, ast.Mod):
-                oprs["%"] +=1
-            if isinstance(n.op, ast.Pow):
-                oprs["**"] +=1
-            if isinstance(n.op, ast.LShift):
-                oprs["<<"] +=1
-            if isinstance(n.op, ast.RShift):
-                oprs[">>"] +=1
-            if isinstance(n.op, ast.BitOr):
-                oprs["|"] +=1
-            if isinstance(n.op, ast.BitXor):
-                oprs["^"] +=1
-            if isinstance(n.op, ast.BitAnd):
-                oprs["&"] +=1
-            if isinstance(n.op, ast.MatMult):
-                oprs["@"] +=1
-        if isinstance(n, ast.AugAssign):
-
-            if isinstance(n.op, ast.Add):
-                oprs["+="] +=1
-            if isinstance(n.op, ast.Sub):
-                oprs["-="] +=1
-            if isinstance(n.op, ast.Mult):
-                oprs["*="] +=1
-            if isinstance(n.op, ast.Div):
-                oprs["/="] +=1
-            if isinstance(n.op, ast.FloorDiv):
-                oprs["//="] +=1
-            if isinstance(n.op, ast.Mod):
-                oprs["%="] +=1
-            if isinstance(n.op, ast.Pow):
-                oprs["**="] +=1
-            if isinstance(n.op, ast.LShift):
-                oprs["<<="] +=1
-            if isinstance(n.op, ast.RShift):
-                oprs[">>="] +=1
-            if isinstance(n.op, ast.BitOr):
-                oprs["|="] +=1
-            if isinstance(n.op, ast.BitXor):
-                oprs["^="] +=1
-            if isinstance(n.op, ast.BitAnd):
-                oprs["&="] +=1
-            if isinstance(n.op, ast.MatMult):
-                oprs["@="] +=1
-        if isinstance(n, ast.BoolOp):
-            if isinstance(n.op, ast.And):
-                oprs["and"] +=1
-            if isinstance(n.op, ast.Or):
-                oprs["or"] +=1
-
-    return oprs
-def count_loops(node):
-    loops= {
-        "For" :0,
-        "While":0,
-        "break" :0,
-        "continue" :0,
-    }
-    for n in ast.walk(node):
-        if isinstance(n, ast.For):
-            loops["For"]+=1
-        elif isinstance(n,ast.While):
-            loops["While"]+=1
-        elif isinstance(n,ast.Break):
-            loops["break"]+=1
-        elif isinstance(n, ast.Continue):
-            loops["continue"] += 1
-    return loops
-def count_try_excent(node):
-    tryes = {
-        "try..except..finally":0
-    }
-    for n in ast.walk(node):
-        if isinstance(n, ast.Try):
-            tryes["try..except..finally"]+=1
-    return tryes
-def count_func(node,vars):
-    funcs = {
-        "return":0,
-        "yeild" :0,
-        "yeild from":0,
-        "lambda":0,
-        "pass":0,
-        "assert":0,
-        "with":0,
-        "class":0,
-        "def":0
-    }
-    for n in ast.walk(node):
-        if isinstance(n, ast.ClassDef):
-            funcs["class"]+=1
-        if isinstance(n, ast.With):
-            funcs["with"]+=1
-        if isinstance(n, ast.Assert):
-            funcs["assert"]+=1
-        if isinstance(n, ast.Return):
-            funcs["return"]+=1
-        elif isinstance(n, ast.Pass):
-            funcs["pass"]+=1
-        elif isinstance(n, ast.Lambda):
-            funcs["lambda"]+=1
-        elif isinstance(n, ast.Yield):
-            funcs["yeild"]+=1
-        elif isinstance(n, ast.YieldFrom):
-            funcs["yeild from"]+=1
-        if isinstance(n, ast.Call):
-            if isinstance(n.func, ast.Attribute):#methods
-                if n.func.attr  in vars:
-                    vars[n.func.attr] -= 1
-
-                if n.func.attr not in funcs:
-                    funcs[n.func.attr]=1
+                elif True:
+                    pass
                 else:
-                    funcs[n.func.attr] += 1
-            elif isinstance(n.func, ast.Name):#functions
-                if n.func.id in vars:
-                    vars[n.func.id]-=1
-                if n.func.id not in funcs:
-                    funcs[n.func.id]=1
-                else:
-                    funcs[n.func.id] += 1
-        #???do we need to add a function declaration to the operands????
-        if isinstance(n, ast.FunctionDef):
-            funcs["def"]+=1
-            if n.name not in funcs:
-                funcs[n.name] = 1
+                    param2 = 15
             else:
-                funcs[n.name] += 1
-        if isinstance(n, ast.ClassDef):
-            funcs["class"]+=1
-            if n.name not in funcs:
-                funcs[n.name] = 1
-            else:
-                funcs[n.name] += 1
-
-    return funcs
-def count_skobki(text, funcs):
-    last_word = ""
-    new_word = ""
-    res = 0
-    temp = (3+4)*4
-    for char in text:
-        if  char not in string.ascii_letters and new_word != "":
-            last_word = new_word
-            new_word = ""
-        elif char == "(" and ((new_word == "" and last_word not in funcs) or new_word not in funcs):
-            res+=1
+                param2 %= 1000
         else:
-            new_word+=char
-    return res
+            pass
 
 
 
+def MyFunc4_test_loops(list1, list2, dict1):
+    i = 0
+    i1 = 0
+    var3 = list(range(len(list1)))
+    for el1 in list1:
+        for el2 in list2:
+            var3[el2] = el2 ** 2 >> 2
+            list1[dict1[el1]] = var3[15]
+            while i < len(dict.items()):
+                var3[i] = 12
+                i += 1
+        for el in range(20):
+            if el == el1:
+                pass
+            else:
+                pass
+        while i1 < el1:
+            var3[i1] = i1
+            i1 = i1 + 2
 
+def is_armstrong(number):
+    order = len(str(number))
+    sum = 0
+    temp = number
+    while temp > 0:
+        digit = temp % 10
+        sum += digit ** order
+        temp //= 10
+    if number == sum:
+        print(f"{number} is an Armstrong number")
+    else:
+        print(f"{number} is not an Armstrong number")
+def MyFunc5_test_try(list1):
+    try:
+        for el in range(20):
+            print(el)
+            el+= (1 >> 4)
+    except IndexError:
+        print("IndexError")
+    except FileExistsError:
+        pass
+    except:
+        print("exception")
+    finally:
+        print("Finally")
+        try:
+            for i in range(30):
+                i = i + 5
+                list1[i]
+        except:
+            print("exception 2")
 
-def parse_file(file_path):
+def generator():
+    while True:
+        data = input("Inter data: ")
+        yield data
+
+def open_file(file_path):
+    text = "string"
     with open(file_path, 'r') as f:
         text= f.read()
-        tree = ast.parse(text)
+    return text
+
+def Mysum(*args):
+    return sum(args)
+def test_skobki(list1):
+    var = (((list1[0] << list1[2] + list1[12]) * 15 + 14 / list1[16]) << 4 >> 2 << 6 ^ 4 | 34) ^ 12
+    if ((True and False) or True and False) and (True or False):
+        pass
+def main():
+    file_path = "file.txt"
+    MyFunc3_test_if(10,20)
+    MyFunc4_test_loops(list(), list(), dict())
+    Myfunc2_test_binary_oprs(100,50,12)
+    MyFunction(10)
+    q = MyClass(4,3,2)
+    q.get_type()
+    open_file(file_path)
+    items = generator()
+
+    for i in range(5):
+        print(next(items))
+    a = 7
+    print(MyFunction(a))
+    a = 1
+    b = 5
+    tolerance = 1e-6
+
+    result = calculate_integral(a, b, tolerance)
+    print("Integral of sin(x) from 1 to 5:", result)
+
+main()
 
 
-    vars = count_variables(tree)
-    loops = count_loops(tree)
-    tryes = count_try_excent(tree)
-    opr = count_binaty_opr(tree)
-    funcs = count_func(tree, vars)
-    skobki = count_skobki(text, funcs)
-if __name__ == "__main__":
-    file_path = "example.py"
-    parse_file(file_path)
+
+
+
+
+
+
+
