@@ -27,15 +27,15 @@ class MainWindow(QMainWindow):
         self.table = QTableWidget(self)  # Create a table
         self.table.setColumnCount(6)  # Set three columns
         self.table.setRowCount(1)  # and one row
-        self.table.setMinimumWidth(500)
-        self.table.setMinimumHeight(500)
+        self.table.setMinimumWidth(700)
+        self.table.setMinimumHeight(700)
         self.table.move(0, 30)
 
         self.file_content = QTextEdit(self)
         self.file_content.setReadOnly(True)
         self.file_content.setMinimumWidth(700)
         self.file_content.setMinimumHeight(800)
-        self.file_content.move(800, 20)
+        self.file_content.move(1000, 20)
 
         self.parse_button = QPushButton(self)
         self.parse_button.setText("Рассчитать метрику Холстеда")
@@ -57,17 +57,17 @@ class MainWindow(QMainWindow):
         self.program_dict = QLineEdit(self)
         self.program_dict.setReadOnly(True)
         self.program_dict.setMinimumWidth(300)
-        self.program_dict.move(500, 30)
+        self.program_dict.move(700, 30)
 
         self.program_len = QLineEdit(self)
         self.program_len.setReadOnly(True)
         self.program_len.setMinimumWidth(300)
-        self.program_len.move(500, 60)
+        self.program_len.move(700, 60)
 
         self.program_volume = QLineEdit(self)
         self.program_volume.setReadOnly(True)
         self.program_volume.setMinimumWidth(300)
-        self.program_volume.move(500, 90)
+        self.program_volume.move(700, 90)
 
     def on_parse_clicked(self):
         #self.file_content.toPlainText() ##Код программы
@@ -80,9 +80,9 @@ class MainWindow(QMainWindow):
         tryes = count_try_excent(tree)
         opr = count_binaty_opr(tree)
         funcs = count_func(tree, vars)
-        skobki = {"( )":count_skobki(text, funcs)}
-        operators = loops | tryes | opr | funcs
-        operands = vars | skobki
+        skobki = {"( )":count_skobki2(text, funcs)}
+        operators = loops | tryes | opr | funcs | skobki
+        operands = vars
 
 
 

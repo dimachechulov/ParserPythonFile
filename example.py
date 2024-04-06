@@ -7,6 +7,7 @@ class MyClass:
         self.var4 = var3 * var2 - var1
 
     def MyMethod(self):
+        temp_string = "literal temp string"
         return self.var1+self.var2
 
     def get_type(self):
@@ -179,6 +180,7 @@ def main():
     MyFunction(10)
     q = MyClass(4,3,2)
     q.get_type()
+    q.MyMethod()
     open_file(file_path)
     items = generator()
 
@@ -194,6 +196,9 @@ def main():
     print("Integral of sin(x) from 1 to 5:", result)
 
 main()
+
+
+
 
 
 

@@ -39,6 +39,7 @@ def count_variables(node):
     return vars
 
 
+
 def count_binaty_opr(node):
     oprs = {
         "+" :0 ,
@@ -68,9 +69,6 @@ def count_binaty_opr(node):
         "not in" :0,
         "not": 0,
         "~" :0,
-        "if":0,
-        "if else" :0,
-        "elif":0,
         "=":0,
         "+=": 0,
         "-=": 0,
@@ -91,18 +89,6 @@ def count_binaty_opr(node):
     for n in ast.walk(node):
         if isinstance(n, ast.Assign):
             oprs["="]+=len(n.targets)
-        if isinstance(n, ast.If):
-
-            if n.orelse:
-                oprs["if else"] += 1
-                #???elif is new operands???
-                # if isinstance(n.orelse[0], ast.If):
-                #     oprs["if else"]-=1
-                #     oprs['elif']+=1
-                # else:
-                #     oprs["else"]+=1
-            else:
-                oprs["if"]+=1
         if isinstance(n, ast.UAdd):
             oprs["+"]+=1
         if isinstance(n, ast.USub):
@@ -352,19 +338,109 @@ def count_skobki2(text, funcs):
     return res
 
 
+def check_depth_conditional_expression(node_body, depth=0, result=[]):
+    if isinstance(node_body, ast.If):
+        get_depth_conditional_expression(node_body, depth + 1, result)
+        for else_node in node_body.orelse:
+            check_depth_conditional_expression(else_node, depth=depth + 1, result=result)
+    if isinstance(node_body, ast.Match):
+        cases = node_body.cases
+        for i in range(len(cases) - 1):
+            get_depth_conditional_expression(cases[i], depth + i + 1, result)
+        if 'value' in cases[-1].pattern._fields:
+            get_depth_conditional_expression(cases[-1], depth + len(cases), result)
+        else:
+            get_depth_conditional_expression(cases[-1], depth + len(cases) - 1, result)
+    elif isinstance(node_body, ast.For):
+        get_depth_conditional_expression(node_body, depth=depth + 1, result=result)
+    elif isinstance(node_body, ast.While):
+        get_depth_conditional_expression(node_body, depth=depth + 1, result=result)
+
+    result.append(depth)
+
+
+def get_depth_conditional_expression(node, depth=0, result=[]):
+    for node_body in node.body:
+        check_depth_conditional_expression(node_body, depth, result)
+
+
+
+
+
+def check_conditional_expression(n, depth=1):
+    global max_depth
+    if isinstance(n, ast.If):
+        result = []
+        get_depth_conditional_expression(n, depth=depth, result=result)
+        max_depth = max(*result, max_depth)
+        for else_node in n.orelse:
+            check_conditional_expression(else_node,depth=depth+1)
+
+    elif isinstance(n, ast.Match):
+        cases = n.cases
+        for i in range(len(cases) - 1):
+            result = []
+            get_depth_conditional_expression(cases[i], depth+i + 1, result=result)
+            max_depth = max(*result, max_depth)
+        if 'value' in cases[-1].pattern._fields:
+            result = []
+            get_depth_conditional_expression(cases[-1], depth+len(cases), result=result)
+            max_depth = max(*result, max_depth)
+        else:
+            result = []
+            get_depth_conditional_expression(cases[-1], depth+len(cases) - 1, result=result)
+            max_depth = max(*result, max_depth)
+    elif isinstance(n, ast.For):
+        result = []
+        get_depth_conditional_expression(n, depth=depth, result=result)
+        max_depth = max(*result, max_depth)
+    elif isinstance(n, ast.While):
+        result = []
+        get_depth_conditional_expression(n, depth=depth, result=result)
+        max_depth = max(*result, max_depth)
+
+def get_max_depth_conditional_expression(node):
+    global  max_depth
+    for n in ast.walk(node):
+        check_conditional_expression(n, depth=0)
+
+def get_count_conditional_expression(node):
+    count = 0
+    for n in ast.walk(node):
+        if isinstance(n, ast.If) or isinstance(n, ast.For) or isinstance(n, ast.While):
+            count+=1
+        if isinstance(n, ast.Match):
+            cases = n.cases
+            if 'value' in cases[-1].pattern._fields:
+                count+=len(cases)
+            else:
+                count+=len(cases)-1
+    return count
+
+
+coun_conditional_expression = 0
+max_depth = 0
 def parse_file(file_path):
     with open(file_path, 'r') as f:
         text = f.read()
         tree = ast.parse(text)
-
-
+    get_max_depth_conditional_expression(tree)
+    count = get_count_conditional_expression(tree)
+    print(max_depth)
+    print(count)
     vars = count_variables(tree)
     loops = count_loops(tree)
     tryes = count_try_excent(tree)
     opr = count_binaty_opr(tree)
     funcs = count_func(tree, vars)
-    skobki = count_skobki(text, funcs)
-    print(f"vars  : {vars}\n loops: {loops}\n opr: {opr}\n funcs {funcs}\n tryes: {tryes} skobki: {skobki}")
+    skobki = {"( )":count_skobki2(text, funcs)}
+
+    CL = count
+    CLI = max_depth
+    cl = count / len(loops | tryes | opr | funcs | skobki)
+    print(f"CL = {CL} cl = {cl} CLI = {CLI}")
+    return max_depth, count, loops | tryes | opr | funcs | skobki
+    # print(f"vars  : {vars}\n loops: {loops}\n opr: {opr}\n funcs {funcs}\n tryes: {tryes} skobki: {skobki}")
 if __name__ == "__main__":
-    file_path = "example.py"
+    file_path = "example1.py"
     parse_file(file_path)
