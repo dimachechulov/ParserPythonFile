@@ -368,11 +368,13 @@ def get_depth_conditional_expression(node, depth=0, result=[]):
 
 
 def check_conditional_expression(n, depth=1):
-    global max_depth
+    global max_depth, conditional_expression_with_max_depth
     if isinstance(n, ast.If):
         result = []
         get_depth_conditional_expression(n, depth=depth, result=result)
-        max_depth = max(*result, max_depth)
+        if max(result) > max_depth:
+            max_depth = max(result)
+            conditional_expression_with_max_depth = n
         for else_node in n.orelse:
             check_conditional_expression(else_node,depth=depth+1)
 
@@ -381,23 +383,34 @@ def check_conditional_expression(n, depth=1):
         for i in range(len(cases) - 1):
             result = []
             get_depth_conditional_expression(cases[i], depth+i + 1, result=result)
-            max_depth = max(*result, max_depth)
+            if max(result) > max_depth:
+                max_depth = max(result)
+                conditional_expression_with_max_depth = n
         if 'value' in cases[-1].pattern._fields:
             result = []
             get_depth_conditional_expression(cases[-1], depth+len(cases), result=result)
-            max_depth = max(*result, max_depth)
+            if max(result) > max_depth:
+                max_depth = max(result)
+                conditional_expression_with_max_depth = n
         else:
             result = []
             get_depth_conditional_expression(cases[-1], depth+len(cases) - 1, result=result)
-            max_depth = max(*result, max_depth)
+            if max(result) > max_depth:
+                max_depth = max(result)
+                conditional_expression_with_max_depth = n
     elif isinstance(n, ast.For):
         result = []
         get_depth_conditional_expression(n, depth=depth, result=result)
-        max_depth = max(*result, max_depth)
+        if max(result) > max_depth:
+            max_depth = max(result)
+            conditional_expression_with_max_depth = n
     elif isinstance(n, ast.While):
         result = []
         get_depth_conditional_expression(n, depth=depth, result=result)
-        max_depth = max(*result, max_depth)
+        if max(result) > max_depth:
+            max_depth = max(result)
+            conditional_expression_with_max_depth = n
+
 
 def get_max_depth_conditional_expression(node):
     global  max_depth
@@ -417,9 +430,18 @@ def get_count_conditional_expression(node):
                 count+=len(cases)-1
     return count
 
+def get_code_by_element(element, text):
+    start = element.lineno
+    end = element.end_lineno
+    strs = text.split('\n')
+    return '\n'.join(strs[start-1:end])
 
-coun_conditional_expression = 0
+
+
+count_conditional_expression = 0
 max_depth = 0
+conditional_expression_with_max_depth = None
+
 def parse_file(file_path):
     with open(file_path, 'r') as f:
         text = f.read()
@@ -434,12 +456,13 @@ def parse_file(file_path):
     opr = count_binaty_opr(tree)
     funcs = count_func(tree, vars)
     skobki = {"( )":count_skobki2(text, funcs)}
-
+    code_with_max_depth = get_code_by_element(conditional_expression_with_max_depth, text)
+    print(code_with_max_depth)
     CL = count
     CLI = max_depth
     cl = count / len(loops | tryes | opr | funcs | skobki)
     print(f"CL = {CL} cl = {cl} CLI = {CLI}")
-    return max_depth, count, loops | tryes | opr | funcs | skobki
+    return max_depth,code_with_max_depth, count, vars, loops | tryes | opr | funcs | skobki
     # print(f"vars  : {vars}\n loops: {loops}\n opr: {opr}\n funcs {funcs}\n tryes: {tryes} skobki: {skobki}")
 if __name__ == "__main__":
     file_path = "example1.py"
